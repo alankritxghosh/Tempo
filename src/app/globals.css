@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg-page: #0A0A0A;
+  --color-bg-card: #111111;
+  --color-bg-panel: #1A1A1A;
+
+  --color-accent: #0A84FF;
+  --color-accent-dark: #0D1F3C;
+
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #8E8E93;
+  --color-text-tertiary: #48484A;
+  --color-text-disabled: #3A3A3C;
+
+  --color-border-default: #2A2A2A;
+  --color-border-hover: #333333;
+  --color-border-accent: #0A84FF;
+
+  --color-success: #30D158;
+  --color-error: #FF453A;
+
+  --color-bg-light: #F8F8FA;
+  --color-surface-light: #FFFFFF;
+  --color-text-light: #111111;
+  --color-border-light: #E0E0E4;
+
+  --radius-button: 6px;
+  --radius-badge: 4px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-elevated: 0 4px 16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+@theme inline {
+  --color-tempo-page: var(--color-bg-page);
+  --color-tempo-card: var(--color-bg-card);
+  --color-tempo-panel: var(--color-bg-panel);
+  --color-tempo-accent: var(--color-accent);
+  --color-tempo-accent-dark: var(--color-accent-dark);
+  --color-tempo-primary: var(--color-text-primary);
+  --color-tempo-secondary: var(--color-text-secondary);
+  --color-tempo-tertiary: var(--color-text-tertiary);
+  --color-tempo-disabled: var(--color-text-disabled);
+  --color-tempo-border: var(--color-border-default);
+  --color-tempo-border-hover: var(--color-border-hover);
+  --color-tempo-border-accent: var(--color-border-accent);
+  --color-tempo-success: var(--color-success);
+  --color-tempo-error: var(--color-error);
+  --color-tempo-light-bg: var(--color-bg-light);
+  --color-tempo-light-surface: var(--color-surface-light);
+  --color-tempo-light-text: var(--color-text-light);
+  --color-tempo-light-border: var(--color-border-light);
+
+  --font-display: var(--font-plus-jakarta-sans);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.sr-only.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

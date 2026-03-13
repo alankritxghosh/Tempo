@@ -1,0 +1,36 @@
+{
+  "name": "tempo-render-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && remotion bundle src/index.ts --out-dir build/bundle",
+    "start": "node dist/server.js",
+    "studio": "remotion studio src/index.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1007.0",
+    "@remotion/bundler": "^4.0.435",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "@remotion/transitions": "^4.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "remotion": "^4.0.0",
+    "uuid": "^11.1.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5"
+  }
+}
