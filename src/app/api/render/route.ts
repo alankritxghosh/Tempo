@@ -66,14 +66,17 @@ export async function POST(request: NextRequest) {
       .eq('id', video.id)
 
     return NextResponse.json({ job_id: jobId, video_id: video.id })
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown render error'
+    console.error('[render] Trigger failed:', message)
+
     await supabase
       .from('videos')
       .update({ status: 'failed' } as never)
       .eq('id', video.id)
 
     return NextResponse.json(
-      { error: 'Render trigger failed' },
+      { error: `Render trigger failed: ${message}` },
       { status: 500 }
     )
   }
