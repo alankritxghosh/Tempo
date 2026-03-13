@@ -61,18 +61,15 @@ export default function UploadPage() {
 
       const screenshotUrls: string[] = []
       for (const file of files) {
-        const fileName = `${user.id}/${Date.now()}-${file.name}`
-        const { error: uploadError } = await supabase.storage
-          .from('screenshots')
-          .upload(fileName, file)
+        const formData = new FormData()
+        formData.append('file', file)
 
-        if (uploadError) throw uploadError
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData })
+        const uploadData = await uploadRes.json()
 
-        const { data: urlData } = supabase.storage
-          .from('screenshots')
-          .getPublicUrl(fileName)
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed')
 
-        screenshotUrls.push(urlData.publicUrl)
+        screenshotUrls.push(uploadData.url)
       }
 
       const response = await fetch('/api/hooks', {
