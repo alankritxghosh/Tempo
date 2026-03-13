@@ -28,14 +28,33 @@ export default function AuthPage() {
     setError(null)
     setLoading(true)
 
-    const { error: authError } = isSignUp
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password })
+    if (isSignUp) {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
 
-    if (authError) {
-      setError(authError.message)
-      setLoading(false)
-      return
+      if (!res.ok) {
+        setError(data.error)
+        setLoading(false)
+        return
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
+        return
+      }
+    } else {
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      if (authError) {
+        setError(authError.message)
+        setLoading(false)
+        return
+      }
     }
 
     router.push('/upload')
