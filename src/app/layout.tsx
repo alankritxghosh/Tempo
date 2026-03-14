@@ -1,12 +1,19 @@
 import type { Metadata } from "next"
-import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google"
+import { Syne, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google"
 import { PostHogProvider } from "@/components/PostHogProvider"
 import "./globals.css"
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
   weight: ["700", "800"],
+  display: "swap",
+})
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "700"],
   display: "swap",
 })
 
@@ -48,7 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${syne.variable} ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <PostHogProvider>
           {children}

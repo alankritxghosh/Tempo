@@ -29,12 +29,12 @@ export function Modal({ open, onClose, children }: ModalProps) {
           exit={{ opacity: 0 }}
         >
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40"
             onClick={onClose}
           />
           <motion.div
-            className="relative bg-tempo-card rounded-[var(--radius-modal)] p-8 max-w-md w-full mx-4"
-            style={{ boxShadow: 'var(--shadow-modal)' }}
+            className="relative bg-tempo-card border-3 border-black p-8 max-w-md w-full mx-4"
+            style={{ boxShadow: 'var(--shadow-xl)' }}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}

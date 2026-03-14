@@ -34,29 +34,28 @@ export function ProPricingCard({ onSuccess, onError }: PricingCardProps) {
   }
 
   return (
-    <div className="bg-tempo-card border border-tempo-border rounded-[var(--radius-card)] p-6 flex flex-col relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-tempo-accent" />
+    <div className="bg-tempo-pink border-3 border-black p-6 flex flex-col relative overflow-hidden shadow-[5px_5px_0_0_#000]">
       <div className="flex items-center gap-2 mb-3">
-        <span className="font-[family-name:var(--font-body)] text-[11px] font-semibold text-tempo-tertiary tracking-[0.08em] uppercase">
+        <span className="font-[family-name:var(--font-mono)] text-[11px] font-semibold text-black tracking-[0.08em] uppercase">
           Pro
         </span>
-        <Badge className="bg-tempo-accent/10 text-tempo-accent">Most Popular</Badge>
+        <Badge>Most Popular</Badge>
       </div>
-      <span className="font-[family-name:var(--font-display)] text-[32px] font-bold text-tempo-primary mb-1">
+      <span className="font-[family-name:var(--font-display)] text-[32px] font-extrabold text-black mb-1">
         ₹999
       </span>
-      <span className="font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary mb-6">
+      <span className="font-[family-name:var(--font-body)] text-[14px] text-black mb-6">
         /month
       </span>
       <ul className="flex flex-col gap-2 flex-1 mb-6">
         {PRO_FEATURES.map(f => (
-          <li key={f} className="font-[family-name:var(--font-body)] text-[15px] text-tempo-secondary">
+          <li key={f} className="font-[family-name:var(--font-body)] text-[15px] text-black">
             {f}
           </li>
         ))}
       </ul>
       {comingSoon ? (
-        <span className="w-full text-center py-3 font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary">
+        <span className="w-full text-center py-3 font-[family-name:var(--font-body)] text-[14px] text-black">
           Pro upgrades coming soon
         </span>
       ) : (

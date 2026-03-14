@@ -37,17 +37,17 @@ export function UpgradeModal({ open, onClose, onUpgraded, onError }: UpgradeModa
     <Modal open={open} onClose={onClose}>
       <div className="flex flex-col gap-6">
         <div>
-          <span className="font-[family-name:var(--font-body)] text-[11px] font-semibold text-tempo-tertiary tracking-[0.08em] uppercase">
+          <span className="font-[family-name:var(--font-mono)] text-[11px] font-semibold text-tempo-secondary tracking-[0.08em] uppercase">
             Upgrade
           </span>
-          <h2 className="font-[family-name:var(--font-display)] text-[32px] font-bold text-tempo-primary tracking-[-0.02em] leading-[1.1] mt-2">
+          <h2 className="font-[family-name:var(--font-display)] text-[32px] font-extrabold text-black tracking-[-0.02em] leading-[1.1] mt-2">
             Go Pro
           </h2>
           <AccentRule className="mt-3" />
         </div>
 
         <div className="flex items-baseline gap-1">
-          <span className="font-[family-name:var(--font-display)] text-[48px] font-bold text-tempo-primary">
+          <span className="font-[family-name:var(--font-display)] text-[48px] font-extrabold text-black">
             ₹999
           </span>
           <span className="font-[family-name:var(--font-body)] text-[15px] text-tempo-secondary">
@@ -58,8 +58,8 @@ export function UpgradeModal({ open, onClose, onUpgraded, onError }: UpgradeModa
         <ul className="flex flex-col gap-3">
           {PRO_FEATURES.map((feature) => (
             <li key={feature} className="flex items-center gap-3">
-              <span className="w-1 h-1 rounded-full bg-tempo-accent flex-shrink-0" />
-              <span className="font-[family-name:var(--font-body)] text-[15px] text-tempo-secondary">
+              <span className="w-2 h-2 bg-black flex-shrink-0" />
+              <span className="font-[family-name:var(--font-body)] text-[15px] text-black">
                 {feature}
               </span>
             </li>

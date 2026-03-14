@@ -98,7 +98,7 @@ export default function StylePage() {
             mass: m.spring.gentle.mass,
           }}
         >
-          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-bold text-tempo-primary tracking-[-0.02em] leading-[1.05] mb-4">
+          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-extrabold text-black tracking-[-0.02em] leading-[1.05] mb-4">
             Choose a style
           </h1>
           <p className="font-[family-name:var(--font-body)] text-[16px] text-tempo-secondary mb-8">
@@ -124,16 +124,16 @@ export default function StylePage() {
               onClick={() => setSelectedMode('dark')}
               className="flex flex-col items-center gap-4 py-6"
             >
-              <div className="relative w-full aspect-video rounded-[var(--radius-badge)] bg-[#0A0A0A] border border-tempo-border overflow-hidden">
+              <div className="relative w-full aspect-video bg-black border-3 border-black overflow-hidden">
                 {screenshotUrl && (
                   <img
                     src={screenshotUrl}
                     alt="Dark mode preview"
-                    className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover rounded-[var(--radius-badge)] opacity-80"
+                    className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover opacity-80"
                   />
                 )}
               </div>
-              <span className="font-[family-name:var(--font-body)] text-[15px] text-tempo-primary">
+              <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-black">
                 Dark
               </span>
             </Card>
@@ -154,16 +154,16 @@ export default function StylePage() {
               onClick={() => setSelectedMode('light')}
               className="flex flex-col items-center gap-4 py-6"
             >
-              <div className="relative w-full aspect-video rounded-[var(--radius-badge)] bg-[#F8F8FA] border border-tempo-light-border overflow-hidden">
+              <div className="relative w-full aspect-video bg-white border-3 border-black overflow-hidden">
                 {screenshotUrl && (
                   <img
                     src={screenshotUrl}
                     alt="Light mode preview"
-                    className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover rounded-[var(--radius-badge)] opacity-80"
+                    className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover opacity-80"
                   />
                 )}
               </div>
-              <span className="font-[family-name:var(--font-body)] text-[15px] text-tempo-primary">
+              <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-black">
                 Light
               </span>
             </Card>

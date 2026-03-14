@@ -1,40 +1,39 @@
 export const colors = {
   bg: {
-    page: '#0A0A0A',
-    card: '#111111',
-    panel: '#1A1A1A',
+    page: '#FFFDF5',
+    card: '#FFFFFF',
+    panel: '#F5F3EE',
   },
-  accent: '#0A84FF',
-  accentDark: '#0D1F3C',
+  pink: '#FF6B6B',
+  yellow: '#FFD23F',
+  blue: '#74B9FF',
+  green: '#88D498',
+  lavender: '#B8A9FA',
+  black: '#000000',
   text: {
-    primary: '#FFFFFF',
-    secondary: '#8E8E93',
-    tertiary: '#48484A',
-    disabled: '#3A3A3C',
+    primary: '#000000',
+    secondary: '#333333',
+    tertiary: '#666666',
+    disabled: '#999999',
   },
   border: {
-    default: '#2A2A2A',
-    hover: '#333333',
-    accent: '#0A84FF',
+    default: '#000000',
   },
-  success: '#30D158',
-  error: '#FF453A',
-  light: {
-    bg: '#F8F8FA',
-    surface: '#FFFFFF',
-    text: '#111111',
-    border: '#E0E0E4',
-  },
+  success: '#88D498',
+  error: '#FF6B6B',
 } as const
 
 export const typography = {
   display: {
     fontFamily: 'var(--font-display)',
-    hero: { size: '96px', mobilSize: '56px', weight: 800, letterSpacing: '-0.03em', lineHeight: '1.0' },
-    h1: { size: '72px', weight: 700, letterSpacing: '-0.02em', lineHeight: '1.05' },
+    hero: { size: '96px', mobileSize: '56px', weight: 800, letterSpacing: '-0.03em', lineHeight: '1.0' },
+    h1: { size: '72px', weight: 800, letterSpacing: '-0.02em', lineHeight: '1.05' },
+  },
+  heading: {
+    fontFamily: 'var(--font-heading)',
     h2: { size: '56px', weight: 700, letterSpacing: '-0.02em', lineHeight: '1.05' },
-    h3: { size: '32px', weight: 700, letterSpacing: '-0.02em', lineHeight: '1.1' },
-    hookCard: { size: '24px', weight: 700, letterSpacing: '-0.01em', lineHeight: '1.2' },
+    h3: { size: '32px', weight: 700, letterSpacing: '-0.01em', lineHeight: '1.1' },
+    card: { size: '24px', weight: 700, letterSpacing: '-0.01em', lineHeight: '1.2' },
   },
   body: {
     fontFamily: 'var(--font-body)',
@@ -42,7 +41,7 @@ export const typography = {
     small: { size: '15px', weight: 400, lineHeight: '1.5' },
   },
   label: {
-    fontFamily: 'var(--font-body)',
+    fontFamily: 'var(--font-mono)',
     section: { size: '11px', weight: 600, letterSpacing: '0.08em', lineHeight: '1.2' },
   },
   mono: {
@@ -70,23 +69,15 @@ export const motion = {
     snappy: { stiffness: 500, damping: 35, mass: 0.8 },
     gentle: { stiffness: 200, damping: 25, mass: 1.2 },
   },
-  hoverDelay: 60,
-  micro: {
-    press: 0.98,
-    select: 1.02,
-    settle: 1.0,
-  },
+  hover: { x: -2, y: -2 },
+  active: { x: 3, y: 3 },
 } as const
 
-export const radius = {
-  button: '6px',
-  badge: '4px',
-  card: '8px',
-  modal: '12px',
-} as const
+export const radius = 0 as const
 
 export const shadows = {
-  card: '0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-  elevated: '0 4px 16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
-  modal: '0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
+  sm: '3px 3px 0 0 #000',
+  md: '5px 5px 0 0 #000',
+  lg: '8px 8px 0 0 #000',
+  xl: '12px 12px 0 0 #000',
 } as const

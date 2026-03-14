@@ -1,112 +1,105 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { AccentRule } from '@/components/ui/AccentRule'
 import { Button } from '@/components/ui/Button'
-import { DirectorBrief } from '@/components/render/DirectorBrief'
+import { Toast } from '@/components/ui/Toast'
 import { ProgressBar } from '@/components/render/ProgressBar'
-import { useRenderStatus } from '@/hooks/useRenderStatus'
+import { DirectorBrief } from '@/components/render/DirectorBrief'
+import { UpgradeBanner } from '@/components/billing/UpgradeBanner'
+import { UpgradeModal } from '@/components/billing/UpgradeModal'
+import { useSession } from '@/hooks/useSession'
 import { motion as m } from '@/tokens'
-import type { DirectorBrief as BriefType } from '@/types'
 
 export default function RenderPage() {
   const router = useRouter()
-  const [brief, setBrief] = useState<BriefType | null>(null)
-  const [jobId, setJobId] = useState<string | null>(null)
-  const [videoId, setVideoId] = useState<string | null>(null)
-  const [renderError, setRenderError] = useState<string | null>(null)
-  const renderTriggered = useRef(false)
-  const renderStatus = useRenderStatus(jobId, videoId)
+  const { user } = useSession()
+  const [brief, setBrief] = useState<string | null>(null)
+  const [progress, setProgress] = useState(0)
+  const [rendering, setRendering] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
+  const [showUpgrade, setShowUpgrade] = useState(false)
 
   useEffect(() => {
-    if (renderTriggered.current) return
-    renderTriggered.current = true
-
-    let cancelled = false
-
-    const storedBrief = sessionStorage.getItem('tempo_brief')
-    if (!storedBrief) {
+    const briefRaw = sessionStorage.getItem('tempo_brief')
+    if (!briefRaw) {
       router.push('/style')
       return
     }
-
-    let parsedBrief: BriefType
     try {
-      parsedBrief = JSON.parse(storedBrief)
+      setBrief(JSON.parse(briefRaw))
     } catch {
       router.push('/style')
-      return
     }
-    setBrief(parsedBrief)
-
-    const triggerRender = async () => {
-      try {
-        const screenshotsRaw = sessionStorage.getItem('tempo_screenshots')
-        const styleMode = sessionStorage.getItem('tempo_style_mode')
-
-        if (!screenshotsRaw || !styleMode) {
-          router.push('/style')
-          return
-        }
-
-        let screenshots: string[]
-        try {
-          screenshots = JSON.parse(screenshotsRaw)
-        } catch {
-          router.push('/upload')
-          return
-        }
-
-        const response = await fetch('/api/render', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            brief: parsedBrief,
-            screenshot_urls: screenshots,
-            style_mode: styleMode,
-          }),
-        })
-
-        if (cancelled) return
-
-        if (!response.ok) {
-          const err = await response.json()
-          setRenderError(err.error || 'Failed to start render')
-          return
-        }
-
-        const data = await response.json()
-        if (cancelled) return
-        setJobId(data.job_id)
-        setVideoId(data.video_id)
-        sessionStorage.setItem('tempo_video_id', data.video_id)
-      } catch (err) {
-        if (cancelled) return
-        setRenderError(err instanceof Error ? err.message : 'Failed to start render')
-      }
-    }
-
-    triggerRender()
-
-    return () => { cancelled = true }
   }, [router])
 
-  useEffect(() => {
-    if (renderStatus.status === 'complete' && renderStatus.video_url) {
-      sessionStorage.setItem('tempo_video_url', renderStatus.video_url)
-      router.push('/preview')
-    }
-  }, [renderStatus, router])
+  const startRender = async () => {
+    setRendering(true)
+    setError(null)
+    setProgress(0)
 
-  const statusLabel = () => {
-    if (renderError || renderStatus.status === 'failed') return 'Failed'
-    if (renderStatus.status === 'rendering') return `Scene ${renderStatus.current_scene || 1} of 3`
-    if (renderStatus.status === 'complete') return 'Complete'
-    return 'Starting...'
+    try {
+      const hookRaw = sessionStorage.getItem('tempo_selected_hook')
+      const screenshotsRaw = sessionStorage.getItem('tempo_screenshots')
+      const styleMode = sessionStorage.getItem('tempo_style_mode')
+      const description = sessionStorage.getItem('tempo_description')
+
+      if (!hookRaw || !screenshotsRaw || !styleMode || !brief || !description) {
+        router.push('/upload')
+        return
+      }
+
+      let hook: { text: string }
+      let screenshots: string[]
+      try {
+        hook = JSON.parse(hookRaw)
+        screenshots = JSON.parse(screenshotsRaw)
+      } catch {
+        router.push('/upload')
+        return
+      }
+
+      const progressInterval = setInterval(() => {
+        setProgress(p => Math.min(p + Math.random() * 8, 90))
+      }, 2000)
+
+      const response = await fetch('/api/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hook_text: hook.text,
+          description,
+          screenshot_urls: screenshots,
+          style_mode: styleMode,
+          brief,
+        }),
+      })
+
+      clearInterval(progressInterval)
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || 'Render failed')
+      }
+
+      const data = await response.json()
+      setProgress(100)
+
+      sessionStorage.setItem('tempo_video_id', data.video_id)
+      sessionStorage.setItem('tempo_video_url', data.video_url)
+
+      setTimeout(() => router.push('/preview'), 500)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setRendering(false)
+    }
   }
+
+  const isPro = user?.user_metadata?.plan === 'pro'
 
   return (
     <div className="min-h-screen bg-tempo-page">
@@ -121,66 +114,72 @@ export default function RenderPage() {
             mass: m.spring.gentle.mass,
           }}
         >
-          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-bold text-tempo-primary tracking-[-0.02em] leading-[1.05] mb-4">
-            {renderError || renderStatus.status === 'failed' ? 'Render failed' : 'Rendering'}
+          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-extrabold text-black tracking-[-0.02em] leading-[1.05] mb-4">
+            Render
           </h1>
-          <p className="font-[family-name:var(--font-body)] text-[16px] text-tempo-secondary mb-8">
-            {renderError || renderStatus.status === 'failed'
-              ? 'Something went wrong while building your video'
-              : 'Building your video...'}
+          <p className="font-[family-name:var(--font-body)] text-[16px] text-tempo-secondary mb-4">
+            Review your brief and start rendering
           </p>
+          <AccentRule className="mb-12" />
         </motion.div>
 
         <div className="flex flex-col gap-8">
           <div>
             <SectionLabel className="mb-4">Director&apos;s brief</SectionLabel>
-            <div className={`bg-tempo-card border rounded-[var(--radius-card)] p-6 ${
-              renderError || renderStatus.status === 'failed'
-                ? 'border-l-[3px] border-l-tempo-error border-t-tempo-border border-r-tempo-border border-b-tempo-border'
-                : 'border-tempo-border'
-            }`}>
-              <DirectorBrief brief={brief} />
-            </div>
+            <DirectorBrief brief={brief} />
           </div>
 
-          {renderError && (
-            <div className="border-l-[3px] border-l-tempo-error pl-4">
-              <p className="font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary">
-                {renderError}
+          {rendering && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <SectionLabel className="mb-4">Progress</SectionLabel>
+              <ProgressBar progress={progress} />
+            </motion.div>
+          )}
+
+          {error && (
+            <div className="border-l-[4px] border-l-tempo-pink pl-4 py-2">
+              <p className="font-[family-name:var(--font-body)] text-[15px] text-black">
+                {error}
               </p>
+              <button
+                onClick={startRender}
+                className="font-[family-name:var(--font-heading)] text-[14px] font-bold text-black hover:underline mt-1 cursor-pointer"
+              >
+                Try again
+              </button>
             </div>
           )}
 
-          <div>
-            <SectionLabel className="mb-4">Progress</SectionLabel>
-            <ProgressBar progress={renderStatus.progress / 100} />
-            <div className="flex items-center justify-between mt-3" role="status" aria-live="polite">
-              <span className="font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary">
-                {statusLabel()}
-              </span>
-              {renderStatus.render_time_seconds && (
-                <div className="flex flex-col items-end gap-1">
-                  <span className="font-[family-name:var(--font-mono)] text-[13px] text-tempo-primary">
-                    {renderStatus.render_time_seconds}s
-                  </span>
-                  <AccentRule />
-                </div>
-              )}
-            </div>
-          </div>
+          {!rendering && !error && (
+            <Button onClick={startRender} className="w-full">
+              Start rendering
+            </Button>
+          )}
 
-          {(renderError || renderStatus.status === 'failed') && (
-            <div className="flex gap-4">
-              <Button onClick={() => router.push('/style')} className="flex-1">
-                Try again
-              </Button>
-              <Button variant="ghost" onClick={() => router.push('/hooks')}>
-                Change hook
-              </Button>
-            </div>
+          {!isPro && !rendering && (
+            <UpgradeBanner onUpgradeClick={() => setShowUpgrade(true)} />
           )}
         </div>
       </div>
+
+      <UpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        onUpgraded={() => setToast({ message: 'Upgraded to Pro!', type: 'success' })}
+        onError={(msg) => setToast({ message: msg, type: 'error' })}
+      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          visible={!!toast}
+          onDismiss={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }

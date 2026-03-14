@@ -15,9 +15,15 @@ type ButtonProps = {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-tempo-accent text-white hover:brightness-110',
-  ghost: 'bg-transparent text-tempo-secondary hover:text-tempo-primary',
-  outline: 'bg-transparent border border-tempo-border text-tempo-primary hover:border-tempo-border-hover',
+  primary: 'bg-tempo-yellow text-black border-3 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_0_#000] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+  ghost: 'bg-transparent text-black hover:underline',
+  outline: 'bg-tempo-page text-black border-3 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_0_#000] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+}
+
+const shadowStyles: Record<ButtonVariant, string> = {
+  primary: 'shadow-[5px_5px_0_0_#000]',
+  ghost: '',
+  outline: 'shadow-[3px_3px_0_0_#000]',
 }
 
 export function Button({
@@ -35,15 +41,16 @@ export function Button({
       onClick={onClick}
       className={`
         inline-flex items-center justify-center gap-2 px-6 py-3
-        font-[family-name:var(--font-body)] text-[15px] font-medium
-        rounded-[var(--radius-button)] cursor-pointer
-        disabled:opacity-40 disabled:cursor-not-allowed
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tempo-accent
+        font-[family-name:var(--font-heading)] text-[15px] font-bold
+        cursor-pointer transition-all duration-100 ease-linear
+        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[5px_5px_0_0_#000] disabled:active:translate-x-0 disabled:active:translate-y-0
+        focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-tempo-blue
         ${variantStyles[variant]}
+        ${shadowStyles[variant]}
         ${className}
       `}
-      whileTap={disabled ? {} : { scale: m.micro.press }}
-      whileHover={disabled ? {} : { scale: m.micro.select }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         type: 'spring',
         stiffness: m.spring.snappy.stiffness,

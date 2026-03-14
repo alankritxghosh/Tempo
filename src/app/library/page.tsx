@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { LibraryClient } from './LibraryClient'
 
 export default async function LibraryPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return null
+  if (!user) redirect('/auth')
 
   const { data: videos } = await supabase
     .from('videos')

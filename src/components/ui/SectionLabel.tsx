@@ -8,8 +8,8 @@ export function SectionLabel({ children, uppercase = true, className = '' }: Sec
   return (
     <span
       className={`
-        block font-[family-name:var(--font-body)] text-[11px] font-semibold
-        tracking-[0.08em] text-tempo-tertiary leading-[1.2]
+        block font-[family-name:var(--font-mono)] text-[11px] font-semibold
+        tracking-[0.08em] text-black leading-[1.2]
         ${uppercase ? 'uppercase' : ''}
         ${className}
       `}

@@ -30,17 +30,17 @@ export function Card({
         }
       } : undefined}
       className={`
-        relative rounded-[var(--radius-card)] p-6 cursor-pointer
-        transition-[background-color,border-color] duration-[60ms]
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tempo-accent
+        relative p-6 cursor-pointer
+        border-3 border-black
+        transition-all duration-100 ease-linear
+        focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-tempo-blue
         ${selected
-          ? 'bg-tempo-accent-dark border border-tempo-border-accent'
-          : 'bg-tempo-card border border-tempo-border hover:bg-[#161616] hover:border-tempo-border-hover'
+          ? 'bg-tempo-yellow shadow-[5px_5px_0_0_#000]'
+          : 'bg-tempo-card shadow-[5px_5px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_0_#000]'
         }
         ${deselected ? 'opacity-45' : ''}
         ${className}
       `}
-      style={deselected ? { transition: 'opacity 200ms ease-out' } : undefined}
       layout
       transition={{
         type: 'spring',
@@ -49,9 +49,6 @@ export function Card({
         mass: m.spring.primary.mass,
       }}
     >
-      {selected && (
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-tempo-accent rounded-l-[var(--radius-card)]" />
-      )}
       {children}
     </motion.div>
   )

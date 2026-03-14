@@ -52,7 +52,7 @@ export default function HooksPage() {
             mass: m.spring.gentle.mass,
           }}
         >
-          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-bold text-tempo-primary tracking-[-0.02em] leading-[1.05] mb-4">
+          <h1 className="font-[family-name:var(--font-display)] text-[32px] md:text-[56px] font-extrabold text-black tracking-[-0.02em] leading-[1.05] mb-4">
             Pick a hook
           </h1>
           <p className="font-[family-name:var(--font-body)] text-[16px] text-tempo-secondary mb-4">

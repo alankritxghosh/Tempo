@@ -5,7 +5,7 @@ type AccentRuleProps = {
 export function AccentRule({ className = '' }: AccentRuleProps) {
   return (
     <div
-      className={`h-[1px] w-[40px] bg-tempo-accent ${className}`}
+      className={`h-[4px] w-[40px] bg-black ${className}`}
     />
   )
 }

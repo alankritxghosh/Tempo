@@ -1,35 +1,30 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { motion as m } from '@/tokens'
 
 type ProgressBarProps = {
   progress: number
-  segments?: number
 }
 
-export function ProgressBar({ progress, segments = 3 }: ProgressBarProps) {
+export function ProgressBar({ progress }: ProgressBarProps) {
   return (
-    <div className="flex gap-2 w-full" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Render progress">
-      {Array.from({ length: segments }).map((_, i) => {
-        const segmentProgress = Math.min(1, Math.max(0, (progress - i / segments) * segments))
-        return (
-          <div key={i} className="flex-1 h-1 bg-tempo-panel rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-tempo-accent rounded-full"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: segmentProgress }}
-              style={{ transformOrigin: 'left' }}
-              transition={{
-                type: 'spring',
-                stiffness: m.spring.primary.stiffness,
-                damping: m.spring.primary.damping,
-                mass: m.spring.primary.mass,
-              }}
-            />
-          </div>
-        )
-      })}
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-black">
+          Rendering video
+        </span>
+        <span className="font-[family-name:var(--font-mono)] text-[13px] text-tempo-secondary">
+          {Math.round(progress)}%
+        </span>
+      </div>
+      <div className="w-full h-[8px] bg-white border-3 border-black">
+        <motion.div
+          className="h-full bg-tempo-pink"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        />
+      </div>
     </div>
   )
 }

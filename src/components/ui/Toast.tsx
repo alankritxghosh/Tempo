@@ -13,9 +13,9 @@ type ToastProps = {
 }
 
 const borderColors = {
-  info: 'border-l-tempo-accent',
-  error: 'border-l-tempo-error',
-  success: 'border-l-tempo-success',
+  info: 'border-l-tempo-blue',
+  error: 'border-l-tempo-pink',
+  success: 'border-l-tempo-green',
 }
 
 export function Toast({
@@ -40,14 +40,14 @@ export function Toast({
           aria-live="assertive"
           className={`
             fixed bottom-6 right-6 z-50
-            bg-tempo-card border border-tempo-border border-l-[3px] ${borderColors[type]}
-            rounded-[var(--radius-card)] px-6 py-4 max-w-sm
+            bg-tempo-card border-3 border-black border-l-[4px] ${borderColors[type]}
+            px-6 py-4 max-w-sm
             font-[family-name:var(--font-body)] text-[15px] text-tempo-primary
           `}
-          style={{ boxShadow: 'var(--shadow-elevated)' }}
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          style={{ boxShadow: 'var(--shadow-md)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
           transition={{
             type: 'spring',
             stiffness: m.spring.snappy.stiffness,

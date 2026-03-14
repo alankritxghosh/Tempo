@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { motion as m } from '@/tokens'
 
 type DropZoneProps = {
   onFilesSelected: (files: File[]) => void
@@ -11,102 +10,72 @@ type DropZoneProps = {
 
 export function DropZone({ onFilesSelected, disabled = false }: DropZoneProps) {
   const [dragActive, setDragActive] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
-    }
-  }, [])
-
-  const validateFiles = (files: FileList): File[] => {
-    const valid: File[] = []
-    for (let i = 0; i < files.length && valid.length < 4; i++) {
-      const file = files[i]
-      if (!['image/png', 'image/jpeg'].includes(file.type)) continue
-      if (file.size > 10 * 1024 * 1024) continue
-      valid.push(file)
-    }
-    return valid
-  }
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
-    e.stopPropagation()
     setDragActive(false)
     if (disabled) return
-    const files = validateFiles(e.dataTransfer.files)
-    if (files.length > 0) onFilesSelected(files)
-  }, [disabled, onFilesSelected])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (disabled || !e.target.files) return
-    const files = validateFiles(e.target.files)
+    const files = Array.from(e.dataTransfer.files).filter(f =>
+      f.type.startsWith('image/')
+    )
     if (files.length > 0) onFilesSelected(files)
+  }, [onFilesSelected, disabled])
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    if (!disabled) setDragActive(true)
+  }
+
+  const handleDragLeave = () => {
+    setDragActive(false)
+  }
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) onFilesSelected(files)
+    e.target.value = ''
   }
 
   return (
-    <motion.div
-      role="button"
-      tabIndex={0}
-      aria-label="Upload area. Click or drag screenshots here."
-      onDragEnter={handleDrag}
-      onDragLeave={handleDrag}
-      onDragOver={handleDrag}
-      onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          inputRef.current?.click()
-        }
-      }}
+    <motion.label
       className={`
-        relative rounded-[var(--radius-card)] p-8 md:p-12 cursor-pointer
-        border-2 border-dashed
         flex flex-col items-center justify-center gap-4
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tempo-accent
+        px-6 py-12 cursor-pointer
+        transition-all duration-100 ease-linear
         ${dragActive
-          ? 'border-tempo-accent bg-tempo-accent-dark/20'
-          : 'border-tempo-border hover:border-tempo-border-hover'
+          ? 'bg-tempo-yellow border-3 border-black border-solid'
+          : 'bg-tempo-page border-3 border-black border-dashed'
         }
         ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
       `}
-      initial={{ opacity: 0, y: 24 }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: m.spring.gentle.stiffness,
-        damping: m.spring.gentle.damping,
-        mass: m.spring.gentle.mass,
-      }}
     >
-      <input
-        ref={inputRef}
-        type="file"
-        multiple
-        accept="image/png,image/jpeg"
-        onChange={handleChange}
-        className="hidden"
-        aria-label="Upload screenshots"
-      />
-      <div className="w-12 h-12 rounded-[var(--radius-card)] bg-tempo-panel flex items-center justify-center">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-tempo-secondary">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" strokeLinecap="round" strokeLinejoin="round"/>
-          <polyline points="17 8 12 3 7 8" strokeLinecap="round" strokeLinejoin="round"/>
-          <line x1="12" y1="3" x2="12" y2="15" strokeLinecap="round" strokeLinejoin="round"/>
+      <div className="flex items-center justify-center w-12 h-12 bg-tempo-pink border-3 border-black">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
       </div>
-      <p className="font-[family-name:var(--font-body)] text-[16px] text-tempo-primary">
+      <p className="font-[family-name:var(--font-heading)] text-[15px] font-bold text-black text-center">
         Drop screenshots here
       </p>
       <p className="font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary">
-        2-4 PNG or JPEG files, max 10MB each
+        or click to browse (PNG, JPG)
       </p>
-    </motion.div>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleFileInput}
+        disabled={disabled}
+      />
+    </motion.label>
   )
 }

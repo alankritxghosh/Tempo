@@ -7,11 +7,11 @@ type SkeletonProps = {
 export function Skeleton({ width, height, className = '' }: SkeletonProps) {
   return (
     <div
-      className={`rounded-[var(--radius-card)] ${className}`}
+      className={`border-2 border-black ${className}`}
       style={{
         width,
         height,
-        background: 'linear-gradient(90deg, #111111 25%, #1A1A1A 50%, #111111 75%)',
+        background: 'linear-gradient(90deg, #F0EEEA 25%, #E8E6E2 50%, #F0EEEA 75%)',
         backgroundSize: '200% 100%',
         animation: 'shimmer 1.5s infinite',
       }}

@@ -32,12 +32,13 @@ export function TextArea({
         maxLength={maxLength}
         rows={rows}
         className={`
-          w-full bg-tempo-panel text-tempo-primary
+          w-full bg-white text-black
           font-[family-name:var(--font-body)] text-[16px]
-          rounded-[var(--radius-card)] p-4 resize-none
-          border placeholder:text-tempo-disabled
-          focus:outline-2 focus:outline-offset-2 focus:outline-tempo-accent
-          ${focused ? 'border-tempo-accent' : 'border-tempo-border'}
+          p-4 resize-none
+          border-3 border-black placeholder:text-tempo-disabled
+          transition-all duration-100 ease-linear
+          focus:outline-3 focus:outline-offset-2 focus:outline-tempo-blue
+          ${focused ? 'shadow-[5px_5px_0_0_#000] translate-x-[-1px] translate-y-[-1px]' : 'shadow-[3px_3px_0_0_#000]'}
         `}
       />
       <span className="absolute bottom-3 right-4 font-[family-name:var(--font-mono)] text-[13px] text-tempo-tertiary">

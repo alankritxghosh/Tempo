@@ -61,10 +61,10 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-tempo-page flex items-center justify-center px-4">
+    <div className="min-h-screen bg-tempo-yellow flex items-center justify-center px-4">
       <motion.div
-        className="w-full max-w-sm bg-tempo-card rounded-[var(--radius-card)] border border-tempo-border p-8"
-        style={{ boxShadow: 'var(--shadow-elevated)' }}
+        className="w-full max-w-sm bg-tempo-card border-3 border-black p-8"
+        style={{ boxShadow: 'var(--shadow-lg)' }}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -74,25 +74,20 @@ export default function AuthPage() {
           mass: m.spring.gentle.mass,
         }}
       >
-        <h1 className="font-[family-name:var(--font-display)] text-[32px] font-bold text-tempo-primary text-center mb-8">
+        <h1 className="font-[family-name:var(--font-display)] text-[32px] font-extrabold text-black text-center mb-8">
           Tempo
         </h1>
 
-        <motion.button
+        <button
           onClick={handleGoogleAuth}
           className="w-full flex items-center justify-center gap-3 py-3 px-4
-            border border-tempo-border rounded-[var(--radius-button)]
-            text-tempo-primary font-[family-name:var(--font-body)] text-[15px]
-            hover:border-tempo-border-hover cursor-pointer
-            focus:outline-2 focus:outline-offset-2 focus:outline-tempo-accent"
-          whileTap={{ scale: m.micro.press }}
-          whileHover={{ scale: m.micro.select }}
-          transition={{
-            type: 'spring',
-            stiffness: m.spring.snappy.stiffness,
-            damping: m.spring.snappy.damping,
-            mass: m.spring.snappy.mass,
-          }}
+            border-3 border-black bg-white
+            text-black font-[family-name:var(--font-heading)] text-[15px] font-bold
+            shadow-[3px_3px_0_0_#000] cursor-pointer
+            transition-all duration-100 ease-linear
+            hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0_0_#000]
+            active:translate-x-[3px] active:translate-y-[3px] active:shadow-none
+            focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-tempo-blue"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -101,12 +96,12 @@ export default function AuthPage() {
             <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
           </svg>
           Continue with Google
-        </motion.button>
+        </button>
 
         <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-[1px] bg-tempo-border" />
-          <span className="font-[family-name:var(--font-body)] text-[11px] text-tempo-tertiary">or</span>
-          <div className="flex-1 h-[1px] bg-tempo-border" />
+          <div className="flex-1 h-[2px] bg-black" />
+          <span className="font-[family-name:var(--font-mono)] text-[11px] text-black font-semibold">or</span>
+          <div className="flex-1 h-[2px] bg-black" />
         </div>
 
         <form onSubmit={handleEmailAuth} className="flex flex-col gap-4">
@@ -119,12 +114,14 @@ export default function AuthPage() {
             placeholder="Email"
             required
             autoComplete="email"
-            className="w-full bg-tempo-panel text-tempo-primary
+            className="w-full bg-white text-black
               font-[family-name:var(--font-body)] text-[16px]
-              rounded-[var(--radius-button)] py-3 px-4
-              border border-tempo-border
+              py-3 px-4
+              border-3 border-black shadow-[3px_3px_0_0_#000]
               placeholder:text-tempo-disabled
-              focus:border-tempo-accent focus:outline-2 focus:outline-offset-2 focus:outline-tempo-accent"
+              transition-all duration-100 ease-linear
+              focus:shadow-[5px_5px_0_0_#000] focus:translate-x-[-1px] focus:translate-y-[-1px]
+              focus:outline-3 focus:outline-offset-2 focus:outline-tempo-blue"
           />
           <label htmlFor="auth-password" className="sr-only">Password</label>
           <input
@@ -136,18 +133,20 @@ export default function AuthPage() {
             required
             minLength={6}
             autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            className="w-full bg-tempo-panel text-tempo-primary
+            className="w-full bg-white text-black
               font-[family-name:var(--font-body)] text-[16px]
-              rounded-[var(--radius-button)] py-3 px-4
-              border border-tempo-border
+              py-3 px-4
+              border-3 border-black shadow-[3px_3px_0_0_#000]
               placeholder:text-tempo-disabled
-              focus:border-tempo-accent focus:outline-2 focus:outline-offset-2 focus:outline-tempo-accent"
+              transition-all duration-100 ease-linear
+              focus:shadow-[5px_5px_0_0_#000] focus:translate-x-[-1px] focus:translate-y-[-1px]
+              focus:outline-3 focus:outline-offset-2 focus:outline-tempo-blue"
           />
 
           <div role="alert" aria-live="polite">
             {error && (
-              <div className="border-l-[3px] border-l-tempo-error pl-3">
-                <p className="font-[family-name:var(--font-body)] text-[14px] text-tempo-secondary">
+              <div className="border-l-[4px] border-l-tempo-pink pl-3">
+                <p className="font-[family-name:var(--font-body)] text-[14px] text-black">
                   {error}
                 </p>
               </div>
@@ -163,7 +162,7 @@ export default function AuthPage() {
           {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
             onClick={() => { setIsSignUp(!isSignUp); setError(null) }}
-            className="text-tempo-accent hover:underline cursor-pointer"
+            className="text-black font-bold hover:underline cursor-pointer"
           >
             {isSignUp ? 'Sign in' : 'Sign up'}
           </button>
