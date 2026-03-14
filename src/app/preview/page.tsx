@@ -11,23 +11,39 @@ import { motion as m } from '@/tokens'
 
 export default function PreviewPage() {
   const router = useRouter()
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [signedUrl, setSignedUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
-    const url = sessionStorage.getItem('tempo_video_url')
-    if (!url) {
+    const videoId = sessionStorage.getItem('tempo_video_id')
+    if (!videoId) {
       router.push('/render')
       return
     }
-    setVideoUrl(url)
+
+    async function fetchSignedUrl() {
+      try {
+        const res = await fetch(`/api/download?video_id=${videoId}`)
+        if (!res.ok) throw new Error('Failed to load video')
+        const data = await res.json()
+        setSignedUrl(data.signed_url)
+      } catch {
+        setToast({ message: 'Could not load video. Try again.', type: 'error' })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSignedUrl()
   }, [router])
 
   const handleDownload = () => {
-    if (!videoUrl) return
+    if (!signedUrl) return
     const link = document.createElement('a')
-    link.href = videoUrl
+    link.href = signedUrl
     link.download = 'tempo-video.mp4'
+    link.target = '_blank'
     link.click()
     setToast({ message: 'Download started', type: 'success' })
   }
@@ -58,7 +74,16 @@ export default function PreviewPage() {
           <AccentRule className="mb-12" />
         </motion.div>
 
-        {videoUrl && (
+        {loading && (
+          <div className="mb-8">
+            <SectionLabel className="mb-4">Video</SectionLabel>
+            <div className="border-3 border-black overflow-hidden aspect-video bg-black flex items-center justify-center" style={{ boxShadow: 'var(--shadow-lg)' }}>
+              <p className="font-[family-name:var(--font-mono)] text-[13px] text-white/50">Loading video...</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && signedUrl && (
           <motion.div
             className="mb-8"
             initial={{ opacity: 0, y: 16 }}
@@ -73,7 +98,7 @@ export default function PreviewPage() {
             <SectionLabel className="mb-4">Video</SectionLabel>
             <div className="border-3 border-black overflow-hidden" style={{ boxShadow: 'var(--shadow-lg)' }}>
               <video
-                src={videoUrl}
+                src={signedUrl}
                 controls
                 autoPlay
                 className="w-full aspect-video bg-black"
@@ -83,7 +108,7 @@ export default function PreviewPage() {
         )}
 
         <div className="flex gap-4">
-          <Button onClick={handleDownload} className="flex-1">
+          <Button onClick={handleDownload} disabled={!signedUrl} className="flex-1">
             Download
           </Button>
           <Button variant="ghost" onClick={handleNewVideo}>

@@ -13,6 +13,26 @@ type VideoCardProps = {
 
 export function VideoCard({ video, onDelete }: VideoCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    if (downloading) return
+    setDownloading(true)
+    try {
+      const res = await fetch(`/api/download?video_id=${video.id}`)
+      if (!res.ok) throw new Error('Download failed')
+      const data = await res.json()
+      const link = document.createElement('a')
+      link.href = data.signed_url
+      link.download = 'tempo-video.mp4'
+      link.target = '_blank'
+      link.click()
+    } catch {
+      // silently fail
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   return (
     <div
@@ -50,18 +70,19 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
 
         <div className="flex gap-2 mt-2">
           {video.video_url && (
-            <a
-              href={video.video_url}
-              download
+            <button
+              onClick={handleDownload}
+              disabled={downloading}
               className="flex-1 text-center py-2 border-3 border-black bg-tempo-page
-                font-[family-name:var(--font-heading)] text-[13px] font-bold text-black
+                font-[family-name:var(--font-heading)] text-[13px] font-bold text-black cursor-pointer
                 shadow-[3px_3px_0_0_#000]
                 transition-all duration-100 ease-linear
                 hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0_0_#000]
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Download
-            </a>
+              {downloading ? 'Loading...' : 'Download'}
+            </button>
           )}
           <button
             onClick={() => setConfirmDelete(true)}
