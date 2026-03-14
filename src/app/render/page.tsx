@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -12,6 +12,7 @@ import { DirectorBrief } from '@/components/render/DirectorBrief'
 import { UpgradeBanner } from '@/components/billing/UpgradeBanner'
 import { UpgradeModal } from '@/components/billing/UpgradeModal'
 import { useSession } from '@/hooks/useSession'
+import { useRenderStatus } from '@/hooks/useRenderStatus'
 import { motion as m } from '@/tokens'
 import type { DirectorBrief as DirectorBriefType } from '@/types'
 
@@ -19,11 +20,15 @@ export default function RenderPage() {
   const router = useRouter()
   const { user } = useSession()
   const [brief, setBrief] = useState<DirectorBriefType | null>(null)
-  const [progress, setProgress] = useState(0)
   const [rendering, setRendering] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
   const [showUpgrade, setShowUpgrade] = useState(false)
+  const [jobId, setJobId] = useState<string | null>(null)
+  const [videoId, setVideoId] = useState<string | null>(null)
+  const hasNavigated = useRef(false)
+
+  const renderStatus = useRenderStatus(jobId, videoId)
 
   useEffect(() => {
     const briefRaw = sessionStorage.getItem('tempo_brief')
@@ -38,49 +43,58 @@ export default function RenderPage() {
     }
   }, [router])
 
+  useEffect(() => {
+    if (hasNavigated.current) return
+
+    if (renderStatus.status === 'complete' && renderStatus.video_url) {
+      hasNavigated.current = true
+      sessionStorage.setItem('tempo_video_url', renderStatus.video_url)
+      router.push('/preview')
+    }
+
+    if (renderStatus.status === 'failed') {
+      setError('Render failed. Please try again.')
+      setRendering(false)
+      setJobId(null)
+      setVideoId(null)
+    }
+  }, [renderStatus, router])
+
+  const progress = rendering
+    ? renderStatus.progress || 0
+    : 0
+
   const startRender = async () => {
     setRendering(true)
     setError(null)
-    setProgress(0)
+    hasNavigated.current = false
 
     try {
-      const hookRaw = sessionStorage.getItem('tempo_selected_hook')
       const screenshotsRaw = sessionStorage.getItem('tempo_screenshots')
       const styleMode = sessionStorage.getItem('tempo_style_mode')
-      const description = sessionStorage.getItem('tempo_description')
 
-      if (!hookRaw || !screenshotsRaw || !styleMode || !brief || !description) {
+      if (!screenshotsRaw || !styleMode || !brief) {
         router.push('/upload')
         return
       }
 
-      let hook: { text: string }
       let screenshots: string[]
       try {
-        hook = JSON.parse(hookRaw)
         screenshots = JSON.parse(screenshotsRaw)
       } catch {
         router.push('/upload')
         return
       }
 
-      const progressInterval = setInterval(() => {
-        setProgress(p => Math.min(p + Math.random() * 8, 90))
-      }, 2000)
-
       const response = await fetch('/api/render', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          hook_text: hook.text,
-          description,
           screenshot_urls: screenshots,
           style_mode: styleMode,
           brief,
         }),
       })
-
-      clearInterval(progressInterval)
 
       if (!response.ok) {
         const err = await response.json()
@@ -88,12 +102,10 @@ export default function RenderPage() {
       }
 
       const data = await response.json()
-      setProgress(100)
 
       sessionStorage.setItem('tempo_video_id', data.video_id)
-      sessionStorage.setItem('tempo_video_url', data.video_url)
-
-      setTimeout(() => router.push('/preview'), 500)
+      setJobId(data.job_id)
+      setVideoId(data.video_id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setRendering(false)

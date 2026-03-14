@@ -45,6 +45,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create video record' }, { status: 500 })
   }
 
+  const renderServerUrl = process.env.REMOTION_RENDER_SERVER_URL
+
+  if (!renderServerUrl) {
+    const placeholderUrl = `videos/${video.id}.mp4`
+    await supabase
+      .from('videos')
+      .update({ status: 'complete', video_url: placeholderUrl } as never)
+      .eq('id', video.id)
+
+    return NextResponse.json({ job_id: video.id, video_id: video.id })
+  }
+
   try {
     const jobId = await triggerRender({
       videoId: video.id,

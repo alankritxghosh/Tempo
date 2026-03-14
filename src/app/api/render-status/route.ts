@@ -32,6 +32,24 @@ export async function GET(request: NextRequest) {
   try {
     const renderServerUrl = process.env.REMOTION_RENDER_SERVER_URL
     if (!renderServerUrl) {
+      const { data: dbVideo } = await supabase
+        .from('videos')
+        .select('status, video_url')
+        .eq('id', videoId)
+        .single()
+
+      if (dbVideo?.status === 'complete' && dbVideo?.video_url) {
+        return NextResponse.json({
+          status: 'complete',
+          progress: 100,
+          video_url: dbVideo.video_url,
+        })
+      }
+
+      if (dbVideo?.status === 'failed') {
+        return NextResponse.json({ status: 'failed', progress: 0 })
+      }
+
       return NextResponse.json({
         status: 'pending',
         progress: 0,
@@ -51,10 +69,10 @@ export async function GET(request: NextRequest) {
         .eq('id', videoId)
         .single()
       if (dbVideo?.status === 'complete') {
-        return NextResponse.json({ status: 'complete', video_url: dbVideo.video_url, progress_percent: 100 })
+        return NextResponse.json({ status: 'complete', video_url: dbVideo.video_url, progress: 100 })
       }
       if (dbVideo?.status === 'failed') {
-        return NextResponse.json({ status: 'failed', progress_percent: 0 })
+        return NextResponse.json({ status: 'failed', progress: 0 })
       }
       return NextResponse.json({ status: 'pending', progress: 0 })
     }
@@ -92,7 +110,10 @@ export async function GET(request: NextRequest) {
         .neq('status', 'complete')
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json({
+      ...data,
+      progress: data.progress_percent ?? data.progress ?? 0,
+    })
   } catch {
     return NextResponse.json({ status: 'pending', progress: 0 })
   }
