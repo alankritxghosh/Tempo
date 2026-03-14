@@ -13,11 +13,12 @@ import { UpgradeBanner } from '@/components/billing/UpgradeBanner'
 import { UpgradeModal } from '@/components/billing/UpgradeModal'
 import { useSession } from '@/hooks/useSession'
 import { motion as m } from '@/tokens'
+import type { DirectorBrief as DirectorBriefType } from '@/types'
 
 export default function RenderPage() {
   const router = useRouter()
   const { user } = useSession()
-  const [brief, setBrief] = useState<string | null>(null)
+  const [brief, setBrief] = useState<DirectorBriefType | null>(null)
   const [progress, setProgress] = useState(0)
   const [rendering, setRendering] = useState(false)
   const [error, setError] = useState<string | null>(null)
