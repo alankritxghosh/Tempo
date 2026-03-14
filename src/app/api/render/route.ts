@@ -24,17 +24,11 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('tier, videos_generated_this_month')
+    .select('tier')
     .eq('id', user.id)
     .single()
 
   const tier = profile?.tier || 'free'
-  const limit = tier === 'pro' ? 15 : 1
-  const used = profile?.videos_generated_this_month || 0
-
-  if (used >= limit) {
-    return NextResponse.json({ error: 'Monthly video limit reached' }, { status: 429 })
-  }
 
   const { data: video, error: insertError } = await supabase
     .from('videos')
