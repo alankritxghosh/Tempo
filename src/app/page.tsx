@@ -1,8 +1,16 @@
-import Link from 'next/link'
-import { LandingVideo } from '@/components/LandingVideo'
+import { Navbar } from '@/components/landing/Navbar'
 import { LandingHero } from '@/components/landing/LandingHero'
+import { BeforeAfter } from '@/components/landing/BeforeAfter'
+import { SocialProof } from '@/components/landing/SocialProof'
+import { SpeedStats } from '@/components/landing/SpeedStats'
+import { UseCaseTabs } from '@/components/landing/UseCaseTabs'
+import { FeatureGrid } from '@/components/landing/FeatureGrid'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { PricingSection } from '@/components/billing/PricingSection'
+import { Testimonials } from '@/components/landing/Testimonials'
+import { FinalCTA } from '@/components/landing/FinalCTA'
+import { AskAI } from '@/components/landing/AskAI'
+import { Footer } from '@/components/landing/Footer'
 import { AccentRule } from '@/components/ui/AccentRule'
 
 export default function LandingPage() {
@@ -17,10 +25,13 @@ export default function LandingPage() {
         Skip to main content
       </a>
 
+      <Navbar />
+
       <main id="main-content">
+        {/* 1. Hero */}
         <LandingHero />
 
-        {/* Marquee */}
+        {/* 2. Marquee */}
         <div className="bg-tempo-yellow border-b-4 border-black py-3 overflow-hidden">
           <div className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -31,17 +42,27 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Demo */}
-        <section className="px-4 py-16 md:py-24 border-b-4 border-black" aria-label="Product demo">
-          <div className="max-w-[960px] mx-auto">
-            <LandingVideo />
-          </div>
-        </section>
+        {/* 3. Before/After Showcase */}
+        <BeforeAfter />
 
-        {/* How it works */}
-        <HowItWorks />
+        {/* 4. Social Proof Strip */}
+        <SocialProof />
 
-        {/* Pricing */}
+        {/* 5. Speed/Stats */}
+        <SpeedStats />
+
+        {/* 6. Use Case Tabs */}
+        <UseCaseTabs />
+
+        {/* 7. Feature Grid */}
+        <FeatureGrid />
+
+        {/* 8. How It Works */}
+        <div id="how-it-works">
+          <HowItWorks />
+        </div>
+
+        {/* 9. Pricing */}
         <section className="px-4 py-24 md:py-32 border-b-4 border-black" id="pricing" aria-label="Pricing">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col items-center mb-12 md:mb-16">
@@ -53,33 +74,19 @@ export default function LandingPage() {
             <PricingSection />
           </div>
         </section>
+
+        {/* 10. Testimonials */}
+        <Testimonials />
+
+        {/* 11. Final CTA */}
+        <FinalCTA />
+
+        {/* 12. Ask AI */}
+        <AskAI />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t-3 border-black px-4 py-8 bg-tempo-page" role="contentinfo">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-[family-name:var(--font-display)] text-[18px] font-extrabold text-black">
-            Tempo
-          </span>
-          <nav aria-label="Footer navigation" className="flex items-center gap-6">
-            <Link
-              href="/auth"
-              className="font-[family-name:var(--font-body)] text-[14px] text-black hover:underline focus:outline-3 focus:outline-offset-3 focus:outline-tempo-blue"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="#pricing"
-              className="font-[family-name:var(--font-body)] text-[14px] text-black hover:underline focus:outline-3 focus:outline-offset-3 focus:outline-tempo-blue"
-            >
-              Pricing
-            </Link>
-          </nav>
-          <span className="font-[family-name:var(--font-mono)] text-[13px] text-tempo-secondary">
-            &copy; {new Date().getFullYear()} Tempo
-          </span>
-        </div>
-      </footer>
+      {/* 13. Footer */}
+      <Footer />
     </div>
   )
 }
