@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import crypto from 'crypto'
 import { isRazorpayConfigured } from '@/lib/razorpay/client'
+import { updateProfile } from '@/lib/supabase/typed-update'
 
 const VerifySchema = z.object({
   razorpay_order_id: z.string().min(1),
@@ -43,10 +44,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Payment verification failed' }, { status: 400 })
   }
 
-  await supabase
-    .from('profiles')
-    .update({ tier: 'pro', subscription_status: 'active' } as never)
-    .eq('id', user.id)
+  await updateProfile(supabase, user.id, { tier: 'pro', subscription_status: 'active' })
 
   return NextResponse.json({ status: 'verified', tier: 'pro' })
 }

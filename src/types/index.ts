@@ -26,7 +26,7 @@ export const HooksResponseSchema = z.object({
 })
 
 export type Hook = z.infer<typeof HookSchema>
-export type HooksResponse = z.infer<typeof HooksResponseSchema>
+type HooksResponse = z.infer<typeof HooksResponseSchema>
 
 export const ElementSchema = z.object({
   type: z.enum(PRIMITIVE_TYPES),
@@ -48,11 +48,11 @@ export const DirectorBriefSchema = z.object({
   total_duration_seconds: z.number(),
 })
 
-export type Element = z.infer<typeof ElementSchema>
-export type Scene = z.infer<typeof SceneSchema>
+type Element = z.infer<typeof ElementSchema>
+type Scene = z.infer<typeof SceneSchema>
 export type DirectorBrief = z.infer<typeof DirectorBriefSchema>
 
-export type VideoStatus = 'pending' | 'rendering' | 'complete' | 'failed'
+type VideoStatus = 'pending' | 'rendering' | 'complete' | 'failed'
 export type Tier = 'free' | 'pro'
 
 export type Profile = {

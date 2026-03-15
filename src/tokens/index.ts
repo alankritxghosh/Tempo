@@ -1,4 +1,4 @@
-export const colors = {
+const colors = {
   bg: {
     page: '#FFFDF5',
     card: '#FFFFFF',
@@ -23,7 +23,7 @@ export const colors = {
   error: '#FF6B6B',
 } as const
 
-export const typography = {
+const typography = {
   display: {
     fontFamily: 'var(--font-display)',
     hero: { size: '96px', mobileSize: '56px', weight: 800, letterSpacing: '-0.03em', lineHeight: '1.0' },
@@ -50,7 +50,7 @@ export const typography = {
   },
 } as const
 
-export const spacing = {
+const spacing = {
   0: '0px',
   1: '4px',
   2: '8px',
@@ -73,9 +73,9 @@ export const motion = {
   active: { x: 3, y: 3 },
 } as const
 
-export const radius = 0 as const
+const radius = 0 as const
 
-export const shadows = {
+const shadows = {
   sm: '3px 3px 0 0 #000',
   md: '5px 5px 0 0 #000',
   lg: '8px 8px 0 0 #000',

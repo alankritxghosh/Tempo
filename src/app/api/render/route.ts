@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { triggerRender } from '@/lib/remotion/client'
 import { DirectorBriefSchema } from '@/types'
+import { updateVideo } from '@/lib/supabase/typed-update'
 
 const RequestSchema = z.object({
   brief: DirectorBriefSchema,
@@ -49,10 +50,7 @@ export async function POST(request: NextRequest) {
 
   if (!renderServerUrl) {
     const placeholderUrl = `videos/${video.id}.mp4`
-    await supabase
-      .from('videos')
-      .update({ status: 'complete', video_url: placeholderUrl } as never)
-      .eq('id', video.id)
+    await updateVideo(supabase, video.id, { status: 'complete', video_url: placeholderUrl })
 
     return NextResponse.json({ job_id: video.id, video_id: video.id })
   }
@@ -66,20 +64,14 @@ export async function POST(request: NextRequest) {
       tier,
     })
 
-    await supabase
-      .from('videos')
-      .update({ status: 'rendering' } as never)
-      .eq('id', video.id)
+    await updateVideo(supabase, video.id, { status: 'rendering' })
 
     return NextResponse.json({ job_id: jobId, video_id: video.id })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown render error'
     console.error('[render] Trigger failed:', message)
 
-    await supabase
-      .from('videos')
-      .update({ status: 'failed' } as never)
-      .eq('id', video.id)
+    await updateVideo(supabase, video.id, { status: 'failed' })
 
     return NextResponse.json(
       { error: `Render trigger failed: ${message}` },

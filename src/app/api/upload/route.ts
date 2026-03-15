@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { NextResponse } from 'next/server'
 
+const MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
+
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Only PNG and JPEG files are allowed' }, { status: 400 })
   }
 
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > MAX_UPLOAD_SIZE_BYTES) {
     return NextResponse.json({ error: 'File must be under 10MB' }, { status: 400 })
   }
 

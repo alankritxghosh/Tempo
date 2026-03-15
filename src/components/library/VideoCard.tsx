@@ -28,7 +28,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
       link.target = '_blank'
       link.click()
     } catch {
-      // silently fail
+      alert('Download failed. Please try again.')
     } finally {
       setDownloading(false)
     }

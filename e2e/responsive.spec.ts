@@ -42,7 +42,7 @@ test.describe('Responsive - Landing Page', () => {
     await page.setViewportSize({ width: 375, height: 812 })
     await page.goto('/')
 
-    const footer = page.locator('footer')
+    const footer = page.locator('footer[role="contentinfo"]')
     await expect(footer).toBeVisible()
   })
 
@@ -61,7 +61,7 @@ test.describe('Responsive - Landing Page', () => {
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('section[aria-label="How it works"]')).toBeVisible()
     await expect(page.locator('#pricing')).toBeVisible()
-    await expect(page.locator('footer')).toBeVisible()
+    await expect(page.locator('footer[role="contentinfo"]')).toBeVisible()
   })
 })
 

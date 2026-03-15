@@ -16,7 +16,7 @@ import { motion as m } from '@/tokens'
 const TEMPO_SESSION_KEYS = [
   'tempo_hooks', 'tempo_description', 'tempo_screenshots',
   'tempo_selected_hook', 'tempo_brief', 'tempo_style_mode',
-  'tempo_video_id', 'tempo_video_url',
+  'tempo_video_id',
 ]
 
 export default function UploadPage() {

@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { HooksResponseSchema, type Hook } from '@/types'
+import { retryGeminiGeneration } from './retry'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -36,25 +37,6 @@ export async function generateHooks(description: string, screenshotUrls: string[
     `\n\nNumber of product screenshots provided: ${screenshotUrls.length}` +
     `\nScreenshot context URLs: ${screenshotUrls.join(', ')}`
 
-  let lastError: Error | null = null
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const result = await model.generateContent(prompt)
-      const text = result.response.text()
-
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('No JSON in Gemini response')
-
-      const parsed = JSON.parse(jsonMatch[0])
-      const validated = HooksResponseSchema.parse(parsed)
-
-      return validated.hooks
-    } catch (err) {
-      lastError = err instanceof Error ? err : new Error('Unknown error')
-      if (attempt < 2) await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
-    }
-  }
-
-  throw lastError || new Error('Hook generation failed after 3 attempts')
+  const validated = await retryGeminiGeneration(model, prompt, HooksResponseSchema)
+  return validated.hooks
 }

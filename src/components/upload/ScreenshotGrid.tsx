@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { motion as m } from '@/tokens'
 
@@ -9,6 +10,12 @@ type ScreenshotGridProps = {
 }
 
 export function ScreenshotGrid({ files, onRemove }: ScreenshotGridProps) {
+  const objectUrls = useMemo(() => files.map(f => URL.createObjectURL(f)), [files])
+
+  useEffect(() => {
+    return () => objectUrls.forEach(url => URL.revokeObjectURL(url))
+  }, [objectUrls])
+
   if (files.length === 0) return null
 
   return (
@@ -31,7 +38,7 @@ export function ScreenshotGrid({ files, onRemove }: ScreenshotGridProps) {
             }}
           >
             <img
-              src={URL.createObjectURL(file)}
+              src={objectUrls[index]}
               alt={`Screenshot ${index + 1}`}
               className="w-full h-full object-cover"
             />

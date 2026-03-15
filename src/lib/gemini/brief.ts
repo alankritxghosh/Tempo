@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { DirectorBriefSchema, type DirectorBrief } from '@/types'
+import { retryGeminiGeneration } from './retry'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -59,26 +60,7 @@ export async function generateBrief(
     `\nStyle mode: ${styleMode}` +
     `\nNumber of screenshots available: ${screenshotUrls.length} (indices 0 to ${screenshotUrls.length - 1})`
 
-  let lastError: Error | null = null
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const result = await model.generateContent(prompt)
-      const text = result.response.text()
-
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('No JSON in Gemini response')
-
-      const parsed = JSON.parse(jsonMatch[0])
-      const validated = DirectorBriefSchema.parse(parsed)
-
-      const computedTotal = validated.scenes.reduce((sum, s) => sum + s.duration_seconds, 0)
-      return { ...validated, total_duration_seconds: computedTotal }
-    } catch (err) {
-      lastError = err instanceof Error ? err : new Error('Unknown error')
-      if (attempt < 2) await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
-    }
-  }
-
-  throw lastError || new Error('Brief generation failed after 3 attempts')
+  const validated = await retryGeminiGeneration(model, prompt, DirectorBriefSchema)
+  const computedTotal = validated.scenes.reduce((sum, s) => sum + s.duration_seconds, 0)
+  return { ...validated, total_duration_seconds: computedTotal }
 }

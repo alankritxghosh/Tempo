@@ -14,16 +14,6 @@ type RenderResponse = {
   position: number
 }
 
-type RenderStatusResponse = {
-  job_id: string
-  status: 'queued' | 'rendering' | 'complete' | 'failed'
-  progress_percent: number
-  current_scene?: number
-  video_url?: string
-  error?: string
-  render_time_seconds?: number
-}
-
 const getHeaders = (): HeadersInit => {
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
   const secret = process.env.REMOTION_RENDER_SERVER_SECRET
@@ -59,30 +49,4 @@ export async function triggerRender(job: RenderJob): Promise<string> {
 
   const data: RenderResponse = await response.json()
   return data.job_id
-}
-
-export async function getRenderStatus(jobId: string): Promise<RenderStatusResponse> {
-  const renderServerUrl = process.env.REMOTION_RENDER_SERVER_URL
-
-  if (!renderServerUrl) {
-    return {
-      job_id: jobId,
-      status: 'complete',
-      progress_percent: 100,
-      video_url: `videos/${jobId}.mp4`,
-      render_time_seconds: 0,
-    }
-  }
-
-  const response = await fetch(`${renderServerUrl}/status/${jobId}`, {
-    method: 'GET',
-    headers: getHeaders(),
-    signal: AbortSignal.timeout(15_000),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Render status check failed with ${response.status}`)
-  }
-
-  return response.json()
 }

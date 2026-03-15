@@ -4,6 +4,7 @@ import { getResendClient } from '@/lib/resend/client'
 import { weeklyHooksEmail } from '@/lib/resend/templates'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { HooksResponseSchema } from '@/types'
+import { retryGeminiGeneration } from '@/lib/gemini/retry'
 
 const CRON_SECRET = process.env.CRON_SECRET
 
@@ -35,20 +36,8 @@ async function generateWeeklyHooks() {
     },
   })
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const result = await model.generateContent(WEEKLY_HOOK_PROMPT)
-      const text = result.response.text()
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('No JSON in Gemini response')
-      const parsed = JSON.parse(jsonMatch[0])
-      const validated = HooksResponseSchema.parse({ hooks: [...parsed.hooks, { text: 'Try it yourself', framework: 'future-pacing', trend_confidence: 0.72 }] })
-      return validated.hooks.slice(0, 3)
-    } catch {
-      if (attempt < 2) await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
-    }
-  }
-  throw new Error('Failed to generate weekly hooks after 3 attempts')
+  const result = await retryGeminiGeneration(model, WEEKLY_HOOK_PROMPT, HooksResponseSchema)
+  return [...result.hooks.slice(0, 3)]
 }
 
 export async function GET(request: NextRequest) {

@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { generateSignedUrl } from '@/lib/r2/client'
 
+const PRO_DOWNLOAD_EXPIRY_SECONDS = 30 * 24 * 60 * 60
+const FREE_DOWNLOAD_EXPIRY_SECONDS = 72 * 60 * 60
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function GET(request: NextRequest) {
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
     .single()
 
   const tier = profile?.tier || 'free'
-  const expirySeconds = tier === 'pro' ? 30 * 24 * 60 * 60 : 72 * 60 * 60
+  const expirySeconds = tier === 'pro' ? PRO_DOWNLOAD_EXPIRY_SECONDS : FREE_DOWNLOAD_EXPIRY_SECONDS
 
   try {
     const signedUrl = await generateSignedUrl(video.video_url, expirySeconds)

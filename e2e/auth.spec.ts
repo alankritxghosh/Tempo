@@ -89,7 +89,7 @@ test.describe('Auth Page WCAG', () => {
     const googleBtn = page.getByRole('button', { name: /continue with google/i })
     await googleBtn.focus()
     const classes = await googleBtn.getAttribute('class')
-    expect(classes).toContain('focus:outline')
+    expect(classes).toMatch(/focus(-visible)?:outline/)
   })
 
   test('email input has focus outline', async ({ page }) => {

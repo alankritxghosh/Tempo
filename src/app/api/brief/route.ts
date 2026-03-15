@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { generateBrief } from '@/lib/gemini/brief'
+import { createRateLimit } from '@/lib/rate-limit'
 
 const RequestSchema = z.object({
   hook_text: z.string().min(1),
@@ -10,21 +11,7 @@ const RequestSchema = z.object({
   style_mode: z.enum(['dark', 'light']),
 })
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_MAX = 5
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(userId)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false
-  entry.count++
-  return true
-}
+const checkRateLimit = createRateLimit(5, 60 * 60 * 1000)
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()

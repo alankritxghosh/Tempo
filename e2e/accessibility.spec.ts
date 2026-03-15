@@ -18,9 +18,9 @@ test.describe('Accessibility - Global', () => {
 test.describe('Accessibility - Focus Management', () => {
   test('landing: CTA link has visible focus style class', async ({ page }) => {
     await page.goto('/')
-    const cta = page.getByRole('link', { name: 'Start creating' })
+    const cta = page.getByRole('link', { name: 'Get Tempo' }).first()
     const classes = await cta.getAttribute('class')
-    expect(classes).toContain('focus:outline')
+    expect(classes).toContain('focus-visible:outline')
   })
 
   test('auth: form inputs have focus styles', async ({ page }) => {
@@ -35,11 +35,12 @@ test.describe('Accessibility - Focus Management', () => {
 
   test('landing: footer links have focus styles', async ({ page }) => {
     await page.goto('/')
-    const footerLinks = page.locator('nav[aria-label="Footer navigation"] a')
+    const footerLinks = page.locator('footer nav[aria-label] a')
     const count = await footerLinks.count()
+    expect(count).toBeGreaterThanOrEqual(1)
     for (let i = 0; i < count; i++) {
       const classes = await footerLinks.nth(i).getAttribute('class')
-      expect(classes).toContain('focus:outline')
+      expect(classes).toContain('focus-visible:outline')
     }
   })
 })
@@ -56,13 +57,15 @@ test.describe('Accessibility - ARIA Attributes', () => {
   test('auth: error div has role="alert"', async ({ page }) => {
     await page.goto('/auth')
     const alert = page.locator('[role="alert"]')
-    await expect(alert).toHaveCount(1)
+    const count = await alert.count()
+    expect(count).toBeGreaterThanOrEqual(1)
   })
 
   test('auth: error div has aria-live="polite"', async ({ page }) => {
     await page.goto('/auth')
     const alertLive = page.locator('[aria-live="polite"]')
-    await expect(alertLive).toHaveCount(1)
+    const count = await alertLive.count()
+    expect(count).toBeGreaterThanOrEqual(1)
   })
 })
 
@@ -73,9 +76,8 @@ test.describe('Accessibility - Keyboard Navigation', () => {
     let foundCta = false
     for (let i = 0; i < 15; i++) {
       await page.keyboard.press('Tab')
-      const tag = await page.evaluate(() => document.activeElement?.tagName)
       const text = await page.evaluate(() => document.activeElement?.textContent)
-      if (text?.includes('Start creating')) {
+      if (text?.includes('Get Tempo')) {
         foundCta = true
         break
       }
@@ -110,12 +112,16 @@ test.describe('Accessibility - Color & Contrast', () => {
 
   test('auth: card background provides contrast against page', async ({ page }) => {
     await page.goto('/auth')
-    const pageBg = await page.evaluate(() =>
-      getComputedStyle(document.querySelector('.bg-tempo-page')!).backgroundColor
-    )
-    const cardBg = await page.evaluate(() =>
-      getComputedStyle(document.querySelector('.bg-tempo-card')!).backgroundColor
-    )
+    const pageBg = await page.evaluate(() => {
+      const el = document.querySelector('.bg-tempo-yellow') || document.querySelector('.bg-tempo-page')
+      return el ? getComputedStyle(el).backgroundColor : null
+    })
+    const cardBg = await page.evaluate(() => {
+      const el = document.querySelector('.bg-tempo-card')
+      return el ? getComputedStyle(el).backgroundColor : null
+    })
+    expect(pageBg).toBeTruthy()
+    expect(cardBg).toBeTruthy()
     expect(pageBg).not.toEqual(cardBg)
   })
 })

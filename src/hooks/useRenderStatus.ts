@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+const RENDER_POLL_INTERVAL_MS = 3000
+
 type RenderStatus = {
   status: 'pending' | 'rendering' | 'complete' | 'failed'
   progress: number
@@ -16,6 +18,7 @@ export function useRenderStatus(jobId: string | null, videoId: string | null) {
     progress: 0,
   })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const failCountRef = useRef(0)
 
   const poll = useCallback(async () => {
     if (!jobId || !videoId) return
@@ -32,14 +35,15 @@ export function useRenderStatus(jobId: string | null, videoId: string | null) {
         }
       }
     } catch {
-      // silently retry on next poll
+      failCountRef.current++
+      if (failCountRef.current >= 3) console.warn('[useRenderStatus] Multiple consecutive poll failures')
     }
   }, [jobId, videoId])
 
   useEffect(() => {
     if (!jobId || !videoId) return
     poll()
-    intervalRef.current = setInterval(poll, 3000)
+    intervalRef.current = setInterval(poll, RENDER_POLL_INTERVAL_MS)
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)

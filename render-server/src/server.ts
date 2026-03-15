@@ -62,6 +62,51 @@ async function ensureBundle(): Promise<string> {
   return bundlePath
 }
 
+async function renderToFile(
+  bundlePath: string,
+  props: TempoVideoProps,
+  jobId: string,
+  videoId: string,
+  onProgress: (progress: number) => void
+): Promise<string> {
+  const composition = await selectComposition({
+    serveUrl: bundlePath,
+    id: 'TempoVideo',
+    inputProps: props,
+  })
+
+  const outputDir = path.join(os.tmpdir(), `tempo-render-${jobId}`)
+  fs.mkdirSync(outputDir, { recursive: true })
+  const outputPath = path.join(outputDir, `${videoId}.mp4`)
+
+  await renderMedia({
+    composition,
+    serveUrl: bundlePath,
+    codec: 'h264',
+    outputLocation: outputPath,
+    inputProps: props,
+    onProgress: ({ progress }) => onProgress(progress),
+  })
+
+  return outputPath
+}
+
+async function uploadToR2(filePath: string, videoId: string): Promise<string> {
+  const videoBuffer = fs.readFileSync(filePath)
+  const r2Key = `videos/${videoId}.mp4`
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: r2Key,
+      Body: videoBuffer,
+      ContentType: 'video/mp4',
+    })
+  )
+
+  return r2Key
+}
+
 async function processRender(
   jobId: string,
   props: TempoVideoProps,
@@ -81,50 +126,22 @@ async function processRender(
 
     const bundled = await ensureBundle()
 
-    const composition = await selectComposition({
-      serveUrl: bundled,
-      id: 'TempoVideo',
-      inputProps: props,
+    const outputPath = await renderToFile(bundled, props, jobId, videoId, (progress) => {
+      const current = jobs.get(jobId)
+      if (current) {
+        const sceneIndex = Math.min(
+          Math.floor(progress * props.brief.scenes.length),
+          props.brief.scenes.length - 1
+        )
+        jobs.set(jobId, {
+          ...current,
+          progress_percent: Math.round(progress * 100),
+          current_scene: sceneIndex,
+        })
+      }
     })
 
-    const outputDir = path.join(os.tmpdir(), `tempo-render-${jobId}`)
-    fs.mkdirSync(outputDir, { recursive: true })
-    const outputPath = path.join(outputDir, `${videoId}.mp4`)
-
-    await renderMedia({
-      composition,
-      serveUrl: bundled,
-      codec: 'h264',
-      outputLocation: outputPath,
-      inputProps: props,
-      onProgress: ({ progress }) => {
-        const current = jobs.get(jobId)
-        if (current) {
-          const sceneIndex = Math.min(
-            Math.floor(progress * props.brief.scenes.length),
-            props.brief.scenes.length - 1
-          )
-          jobs.set(jobId, {
-            ...current,
-            progress_percent: Math.round(progress * 100),
-            current_scene: sceneIndex,
-          })
-        }
-      },
-    })
-
-    const videoBuffer = fs.readFileSync(outputPath)
-    const r2Key = `videos/${videoId}.mp4`
-
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: R2_BUCKET_NAME,
-        Key: r2Key,
-        Body: videoBuffer,
-        ContentType: 'video/mp4',
-      })
-    )
-
+    const r2Key = await uploadToR2(outputPath, videoId)
     const renderTime = (Date.now() - startTime) / 1000
 
     jobs.set(jobId, {
@@ -137,6 +154,7 @@ async function processRender(
 
     console.log(`[render] Job ${jobId} complete in ${renderTime.toFixed(1)}s`)
 
+    const outputDir = path.dirname(outputPath)
     fs.rmSync(outputDir, { recursive: true, force: true })
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown render error'

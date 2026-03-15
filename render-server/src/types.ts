@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const PRIMITIVE_TYPES = [
+const PRIMITIVE_TYPES = [
   'WordReveal',
   'ScreenPush',
   'TitleSlam',
@@ -9,14 +9,14 @@ export const PRIMITIVE_TYPES = [
   'CTALock',
 ] as const
 
-export const ElementSchema = z.object({
+const ElementSchema = z.object({
   type: z.enum(PRIMITIVE_TYPES),
   text: z.string().optional(),
   screenshot_index: z.number().int().min(0).optional(),
   delay_seconds: z.number().min(0).optional(),
 })
 
-export const SceneSchema = z.object({
+const SceneSchema = z.object({
   scene_type: z.enum(['hook', 'product_reveal', 'cta']),
   duration_seconds: z.number().min(2).max(15),
   elements: z.array(ElementSchema).min(1),
@@ -39,7 +39,6 @@ export type RenderJobRequest = {
   screenshot_urls: string[]
   tier: Tier
   video_id: string
-  callback_url?: string
 }
 
 export type RenderJobStatus = {
@@ -52,9 +51,3 @@ export type RenderJobStatus = {
   render_time_seconds?: number
 }
 
-export const springConfigs = {
-  smooth: { damping: 200 },
-  snappy: { damping: 20, stiffness: 200 },
-  bouncy: { damping: 8 },
-  heavy: { damping: 15, stiffness: 80, mass: 2 },
-} as const

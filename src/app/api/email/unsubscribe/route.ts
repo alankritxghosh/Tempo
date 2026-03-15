@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { updateProfile } from '@/lib/supabase/typed-update'
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token')
@@ -33,10 +34,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Invalid unsubscribe link', { status: 400 })
   }
 
-  await supabase
-    .from('profiles')
-    .update({ hook_email_opted_in: false } as never)
-    .eq('id', userId)
+  await updateProfile(supabase, userId, { hook_email_opted_in: false })
 
   return new NextResponse(
     `<!DOCTYPE html>

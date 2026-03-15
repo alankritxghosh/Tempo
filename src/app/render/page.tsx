@@ -48,7 +48,6 @@ export default function RenderPage() {
 
     if (renderStatus.status === 'complete' && renderStatus.video_url) {
       hasNavigated.current = true
-      sessionStorage.setItem('tempo_video_url', renderStatus.video_url)
       router.push('/preview')
     }
 
